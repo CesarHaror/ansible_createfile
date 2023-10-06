@@ -32,14 +32,3 @@
     - name: Mostrar contenido del archivo
       ansible.builtin.debug:
         var: filecontent.stdout_lines
-
-
-    # - name: Leer contenido del archivo
-    #   ansible.builtin.file:
-    #     path: "{{ filetxt }}"
-    #     state: file
-    #   register: filecontent
-
-    # - name: Imprimir contenido del archivo
-    #   ansible.builtin.debug:
-    #     var: filecontent
