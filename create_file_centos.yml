@@ -1,7 +1,7 @@
 ---
 - name: Validar y modificar archivo
   hosts: all
-  become: yes
+  become: true
   vars:
     filetxt: /tmp/text.txt
     startfleet_var: "Contenido para añadir al final del archivo."
@@ -22,24 +22,14 @@
       lineinfile:
         path: "{{ filetxt }}"
         line: "{{ startfleet_var }}"
-        insertafter: EOF
         create: yes
-    
+      when: fileexist.stat.exists
+
     - name: Leer contenido del archivo remoto
-      ansible.builtin.shell: cat "{{ filetxt }}"
-      register: filecontent
+      set_fact:
+        remote_file: "{{ lookup('file', '/tmp/text.txt') }}"
+      delegate_to: localhost
 
-    - name: Mostrar contenido del archivo
-      ansible.builtin.debug:
-        var: filecontent.stdout_lines
-
-
-    # - name: Leer contenido del archivo
-    #   ansible.builtin.file:
-    #     path: "{{ filetxt }}"
-    #     state: file
-    #   register: filecontent
-
-    # - name: Imprimir contenido del archivo
-    #   ansible.builtin.debug:
-    #     var: filecontent
+    - name: Imprimir contenido del archivo remoto
+      debug:
+        var: remote_file
