@@ -1,0 +1,40 @@
+##############################################################################
+#
+# Playbook para validar, crear y modificar un archivo
+# CesarHaror
+##############################################################################
+---
+- name: Validar y Modificar Archivo
+  hosts: all
+  become: yes
+  vars:
+    filetxt: /tmp/text.txt
+    startfleet_var: "Contenido para añadir al archivo."
+
+  tasks:
+    - name: Verificar si el archivo existe
+      stat:
+        path: "{{ filetxt }}"
+      register: fileexist
+
+    - name: Crear archivo si no existe
+      file:
+        path: "{{ filetxt }}"
+        state: touch
+      when: not fileexist.stat.exists
+
+    - name: Agregar contenido al archivo
+      ansible.builtin.lineinfile:
+        path: "{{ filetxt }}"
+        line: "{{ startfleet_var }}"
+        insertafter: EOF
+        create: yes
+
+    - name: Leer el contenido del archivo
+      ansible.builtin.slurp:
+        path: "{{ filetxt }}"
+      register: remotefile
+
+    - name: Mostrar el contenido del archivo
+      ansible.builtin.debug:
+        msg: "{{ remotefile['content'] | b64decode }}"
